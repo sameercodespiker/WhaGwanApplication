@@ -1,6 +1,8 @@
 Ti.include('suds.js');
-Ti.App.Properties.setString('AppStart', 'false');
 
+Ti.Database.install('InterestDB.sqlite', 'interest');
+
+var AppStart = 'false';
 
 var loginWin = Ti.UI.createWindow({
  	backgroundImage: 'bg.png',
@@ -10,10 +12,9 @@ var loginWin = Ti.UI.createWindow({
 
 var event_title ="abc";
 var intrestsSend = '';
-var NavGroup = Ti.UI.iOS.createNavigationWindow({
+/*var NavGroup = Ti.UI.iOS.createNavigationWindow({
 	window: loginWin,
-	
-});
+}); */
 
 var events = Ti.UI.createWindow({
 	backgroundImage: 'bg.png',
@@ -36,7 +37,7 @@ var drawer = Ti.UI.createWindow({
 	top:0,
 	width:180,
 	borderColor: '#000000',
-    backgroundColor: '#666666',
+    backgroundColor: '#a2a2a2',
     toggle: false
 });
 
@@ -52,7 +53,32 @@ var Location = Ti.UI.createWindow({
     barImage : 'orange.png'
 });
 
-/*if (Ti.App.Properties.getString('AppStart')== 'false'){
+var iconScroll = Ti.UI.createScrollView({
+scrollType:'vertical',
+left: 0,
+width:320,
+top: 30
+	});
+
+var fetchinglabel = Ti.UI.createLabel({
+	    top: 2,
+	    left: 10,
+	    width: 'auto',
+	    height: 'auto',
+	    text: 'Fetching Events...'
+	});
+	iconScroll.add(fetchinglabel);	
+	
+
+var eve = [];
+var eventtitle = [];
+var interPeople= [];
+var gg = [];
+var eventimage = [];
+var imageview = [];
+
+if (Ti.App.Properties.getString('AppStart') == null)
+{
 	var NavGroup = Ti.UI.iOS.createNavigationWindow({
 	window: loginWin
 	});
@@ -61,15 +87,64 @@ var Location = Ti.UI.createWindow({
 	Ti.API.log(Ti.App.Properties.getString('AppStart'));
 	}
 else{
-	var NavGroup = Ti.UI.iOS.createNavigationWindow({
-	window: events
+var NavGroup = Ti.UI.iOS.createNavigationWindow({
+window: events
 });
-} */
+GetEvents();
+} 
 
-var drawertoggle = false;
+function getGoing( a, b){
+	
+	var url_abc = "http://whagwanapp.com/webservice5.asmx";
+	var callparams_abc = {
+		un: b,
+	   	sig : 'count'
+	};
+
+	var suds_abc = new SudsClient({
+	    endpoint: url_abc,
+	    targetNamespace: 'http://whagwanapp.com/'
+	});
+	
+	try {
+	    	suds_abc.invoke('HelloWorld', callparams_abc, function(xmlDoc) {
+	        var results_abc = xmlDoc.documentElement.getElementsByTagName('HelloWorldResult');
+	        	if (results_abc && results_abc.length>0) {
+	            	var result_abc = results_abc.item(0).text;
+	            	var goingCount = result_abc;
+	            	Ti.API.log("Going:" + goingCount);
+	            	gg[a] = Titanium.UI.createLabel({
+					backgroundColor:'transparent',
+					width:'30',
+					height:'10',
+					left:65,
+					bottom: 5,
+					minimumFontSize: 4,
+					text: goingCount
+					});
+					eve[a].add(gg[a]);     
+
+	            	}
+				 else
+	        {
+	             Ti.API.log('Nai chala');	
+	        }
+
+  
+	    });
+	
+	} catch(e) {
+	    Ti.API.error('Error: ' + e);
+	}
+}
 //*********************************//
 //LOGIN CODE STARTS FROM HERE//
 //*********************************//
+/*loginWin.addEventListener('open', function(e){
+var db_C = Ti.Database.open('interest');	
+	db_C.execute('DELETE from Userint');
+	db_C.execute('DELETE from Int');
+});*/
 
 var view = Ti.UI.createView();
 
@@ -126,6 +201,8 @@ height: 160,
 showVerticalScrollIndicator: true
 	});
 
+
+
 var userInterests = [];
 var GetInterests = [];
 var url = "http://whagwanapp.com/webservice3.asmx";
@@ -144,36 +221,53 @@ var url = "http://whagwanapp.com/webservice3.asmx";
 	        if (results && results.length>0) 
 	        {		var result = results.item(0).text;
 	        		var interestList = result.split('/');
-	        		for (var i = 0; i < interestList.length; i++)
-	          	{
+	        		for (var i = 0; i < interestList.length - 1; i++)
+	          		{	
+	          			var db_a = Ti.Database.open('interest');	
+						var Rows = db_a.execute('SELECT * FROM Int where Name = "'+ interestList[i] +'" ');
+						if(Rows.isValidRow()){
+    					//	Ti.API.log("Exists");
+						}
+						else {
+							db_a.execute('INSERT into Int(Name) VALUES("'+ interestList[i] +'")');
+							Ti.API.log("Insert");
+						}
+						db_a.close(); 
 	          			var btnH = '30';
+	          			var topValue = 10 + (btnH * i);
 	          			
-					var topValue = 10 + (btnH * i);
-					GetInterests[i] = Ti.UI.createButton({
-					color: '#000000',
-					title: interestList[i],
-					top: topValue,
-					left: 30,
-					height: btnH,
-					width: 260,
-					backgroundImage: 'eventsButton.png',
-					following: 'false'
-					});
-			interestScroll.add(GetInterests[i]);  
-	  			
-	  		GetInterests[i].addEventListener('click', function(e){
-	  		if (e.source.following == 'false'){
-	  			e.source.backgroundImage = 'boxx.png';
-	  			e.source.following  = 'true';
-	  		}
-			else 
-			{
-				e.source.backgroundImage = 'eventsButton.png';
-				e.source.following  = 'false';	
-			}
+						GetInterests[i] = Ti.UI.createButton({
+							color: '#000000',
+							title: interestList[i],
+							top: topValue,
+							left: 30,
+							height: btnH,
+							width: 260,
+							backgroundImage: 'eventsButton.png',
+							following: false,
+							editable: true
+					
+						});
+					interestScroll.add(GetInterests[i]);  
+	  				  			
+	  				GetInterests[i].addEventListener('click', function(e)
+	  				{
+	  					if (e.source.following == false)
+	  					{
+	  						e.source.backgroundImage = 'boxx.png';
+	  						e.source.following  = true;
+	  						
+	  					}
+						else 
+						{
+							e.source.backgroundImage = 'eventsButton.png';
+							e.source.following  = false;	
+							
+							
+						}
 	
-			});
-	        } 
+					});
+	        	} 
 	       
 	        }
      else
@@ -195,35 +289,68 @@ backgroundImage: 'next.png'
 });
 
 button.addEventListener('click', function(e){
-if (username.hasText() == false || pass.hasText() == false ){
-  var dialog = Ti.UI.createAlertDialog({
-    title: 'Invalid Input',
-    message: 'Please enter username and email address to continue',
-    buttonNames: ['OK']
-  });
-  dialog.addEventListener('click', function(e){
-  //  Ti.API.info('e.text: ' + e.text);
+					var UN = username.value;
+	 				var PW = pass.value;
+	 				Ti.API.log(UN + " " + PW);
+	 				var db = Ti.Database.open('interest');	
+	 				var Rows = db.execute('SELECT * FROM AppUser where username = "'+ UN +'" ');
+					if(Rows.isValidRow()){
+    				//means you already have it in your favorites
+    					Ti.API.log("ExistsInAPPUser");
+					}
+					else { 
+						db.execute('INSERT into AppUser(username) VALUES("'+ UN +'")');
+						Ti.API.log("InsertInAPPUser");
+					}
+if (username.hasText() == false || pass.hasText() == false )
+{
+ 	 	var dialog = Ti.UI.createAlertDialog({
+    	title: 'Invalid Input',
+    	message: 'Please enter username and email address to continue',
+   		 buttonNames: ['OK']
+ });
+dialog.addEventListener('click', function(e){
+  
   });
   dialog.show();
 }
 else
 {
-	
-	 for (var i = 0; i < GetInterests.length; i++){
-	 			if (GetInterests[i].following == 'true')
+			for (var i = 0; i < GetInterests.length; i++)
+	 		{
+	 			if (GetInterests[i].following == true)
 	 			{
-	 				userInterests.push(GetInterests[i].title);
+	 				Ti.API.log("Checking if I am true" + GetInterests[i].title);
+					userInterests.push(GetInterests[i].title);
 	 			}	
-	 }
+ 				else
+ 				{
+	 				Ti.API.log('i ' + i + ' : ' + GetInterests[i].following);
+	 			}
+	 		}
 	        
 	 for (var i = 0 ; i < userInterests.length; i ++)
-	 {
-	 	intrestsSend = intrestsSend + userInterests[i] + '%';
+	 {				
+	 				
+	 				var db = Ti.Database.open('interest');	
+					var Rows = db.execute('SELECT * FROM Userint where interestfollow = "'+ userInterests[i] +'" ');
+					if(Rows.isValidRow()){
+    				//means you already have it in your favorites
+    					Ti.API.log("ExistsInUser");
+					}
+					else { 
+						db.execute('INSERT into Userint(interestfollow) VALUES("'+ userInterests[i] +'")');
+						Ti.API.log("InsertInUser");
+					}
+					db.close(); 
+	 				intrestsSend = intrestsSend + userInterests[i] + '%';
 	 }
-	 var UN = username.value;
-	 var PW = pass.value;
-
-	  NavGroup.openWindow(Location, {animated:true});
+	
+	
+	
+	NavGroup.openWindow(Location, {animated:true});
+	//
+	
 	var url_e = "http://whagwanapp.com/webservice4.asmx";
 	var callparams_e = {
        	   A: UN,
@@ -242,7 +369,7 @@ else
 	        if (results && results.length>0) 
 	        {
 	        var result = results.item(0).text;
-	       	Ti.API.log(result);
+	       //	Ti.API.log(result);
 	        }
 });
 	} 
@@ -260,7 +387,6 @@ view.add(label3);
 view.add(pass);
 view.add(button);
 view.add(interestScroll);
-//view.add(listView2);
 loginWin.add(view);
 NavGroup.open();
 
@@ -275,54 +401,56 @@ width: '10dp',
 //toggle: false
 });
 
+function MoveRight()
+{
+	iconScroll.left = 180;
+}
+
+function MoveLeft()
+{
+	iconScroll.left= 0;
+}
 
 button.addEventListener('click', function(e){
-	if (drawertoggle == false){
-		drawertoggle = true;
+	if (drawer.toggle == false)
+	{
+		drawer.toggle = true;
 		drawer.open();	
-		NavGroup.left= 180;
-		}
-	else{
+		MoveRight();
+	}
+	else
+	{
 		drawer.close();
-		drawertoggle = false;
-		NavGroup.left= 0;
-		}
+		drawer.toggle = false;
+		MoveLeft();
+	}
 
 }); 
 
 events.leftNavButton= button;
 
 
-var iconScroll = Ti.UI.createScrollView({
-scrollType:'vertical',
-left: 0,
-width:320,
-top: 30
-	});
 
-var fetchinglabel = Ti.UI.createLabel({
-	    top: 2,
-	    left: 10,
-	    width: 'auto',
-	    height: 'auto',
-	    text: 'Fetching Events...'
-	});
-	iconScroll.add(fetchinglabel);	
-		
-		var eve = [];
-var eventtitle = [];
-var interPeople= [];
-var gg = [];
-var eventimage = [];
-var imageview = [];
-var numberofButtons = 10;
 
-Ti.API.log(intrestsSend);
-//var tosend = Ti.App.Properties.getString('isend');
 
 function GetEvents()
-{
-	//Ti.API.log(tosend);
+{	intrestsSend = '';
+	var db_C = Ti.Database.open('interest');
+	var FollowingInterests = db_C.execute('SELECT * FROM Userint');
+	while (FollowingInterests.isValidRow()){
+				var interestsString = FollowingInterests.fieldByName('interestfollow');
+				intrestsSend = intrestsSend + interestsString + '%';
+				//Ti.API.log(intrestsSend);
+				FollowingInterests.next();
+				}
+	//Ti.API.log(intrestsSend);
+	//db_C.execute('DELETE from Userint');
+	//db_C.execute('DELETE from Int');
+	db_C.close();
+	
+	
+	Ti.API.log("joji " + intrestsSend);
+	
 	var url = "http://whagwanapp.com/webservice.asmx";
 	var callparams = {
 	   sig : intrestsSend
@@ -351,7 +479,7 @@ function GetEvents()
 		left: 30,
 		height: btnH,
 		width: 260,
-		buttonname:''
+		buttonname:'',
 });
 
 var imagenameforbutton = buttonProperties[1];
@@ -390,23 +518,59 @@ interPeople[i] = Titanium.UI.createLabel({
 	});
 	
 eve[i].add(interPeople[i]);
+var nametoSend = buttonProperties[0];
+getGoing(i, nametoSend);
+//Ti.API.log("Going:" + goingCount);
 
-gg[i] = Titanium.UI.createLabel({
-		backgroundColor:'transparent',
-		width:'30',
-		height:'10',
-		left:65,
-		bottom: 5,
-		text:'0 going',
-		minimumFontSize: 4
-	});
-eve[i].add(gg[i]);
 
+events.addEventListener('click', function(e){
+	if(drawer.toggle == true){
+		drawer.close();
+		drawer.toggle = false;
+		MoveLeft();
+	}
+	
+});
 //*********************************//
 //EVENT DETAIL CODE STARTS FROM HERE//
 //*********************************//
 
-eve[i].addEventListener('click', function(e){
+eve[i].addEventListener('click', function(e)
+{
+
+if (drawer.toggle == true)
+{
+	return;
+}
+
+ var url_abc = "http://whagwanapp.com/webservice5.asmx";
+ var callparams_abc = {
+		un: e.source.buttonname,
+	   	sig : 'insertInterested'
+	};
+
+var suds_abc = new SudsClient({
+	    endpoint: url_abc,
+	    targetNamespace: 'http://whagwanapp.com/'
+	});
+	
+try {
+	  suds_abc.invoke('HelloWorld', callparams_abc, function(xmlDoc) {
+	  var results_abc = xmlDoc.documentElement.getElementsByTagName('HelloWorldResult');
+	  if (results_abc && results_abc.length>0) {
+	      var result_abc = results_abc.item(0).text;
+	      var goingCount = result_abc;
+	      Ti.API.log("Interest " + goingCount);
+	    }
+		else
+	        {
+	             Ti.API.log('Nai chala');	
+	        }
+	});
+	
+	} catch(e) {
+	    Ti.API.error('Error: ' + e);
+	}
 
 var testwin = Ti.UI.createWindow({
 backgroundImage: 'bg.png',
@@ -425,6 +589,8 @@ BackButton.addEventListener('click', function(e){
 	testwin.close();
 });
 testwin.leftNavButton = BackButton;
+
+
 var lll = Ti.UI.createLabel({
 top: 70,
 left: 50	
@@ -441,28 +607,70 @@ borderWidth: 5,
 backgroundColor: '#D7D4d8',
 center: {x:'160dp' , y:'210dp'}
 });
+
 var going = false;
 
-	var join = Ti.UI.createLabel({
+
+var db_e = Ti.Database.open('interest');	
+var Rows = db_e.execute('SELECT username FROM AppUser');
+Ti.API.log(Rows);
+db_e.close(); 
+
+var join = Ti.UI.createLabel({
 			text:'JOIN',
 			color:'blue',
 			font:{fontSize:14}
-		});
-	eventdetail.rightNavButton = join;
+});
+testwin.rightNavButton = join;
 	
-	join.addEventListener('click', function(e) {
-	if (going == false){
+join.addEventListener('click', function(e) {
+if (going == false)
+    {
 	going = true;
     join.text = 'GOING';
-    join.color= 'green';}
+    join.color= 'green';
+   Ti.API.log(testwin.myvar);
+    var url_abc = "http://whagwanapp.com/webservice5.asmx";
+	var callparams_abc = {
+		un: testwin.myvar,
+	   	sig : 'insert'
+	};
+
+	var suds_abc = new SudsClient({
+	    endpoint: url_abc,
+	    targetNamespace: 'http://whagwanapp.com/'
+	});
+	
+	try {
+	    	suds_abc.invoke('HelloWorld', callparams_abc, function(xmlDoc) {
+	        var results_abc = xmlDoc.documentElement.getElementsByTagName('HelloWorldResult');
+	        	if (results_abc && results_abc.length>0) {
+	            	var result_abc = results_abc.item(0).text;
+	            	var goingCount = result_abc;
+	            	Ti.API.log("Done " + goingCount);
+	           
+	            	}
+				 else
+	        {
+	             Ti.API.log('Nai chala');	
+	        }
+
+  
+	    });
+	
+	} catch(e) {
+	    Ti.API.error('Error: ' + e);
+	}
     
-    else
+    }
+else
     {
     going = false;
     join.text = 'JOIN';
     join.color= 'blue';
     }
 });
+
 
 var fbshare = Ti.UI.createButton({
 backgroundImage: 'fb.png',
@@ -485,11 +693,11 @@ fb.addEventListener('login', function(e) {
 	
 var data = {
     link : "http://www.codespikestudios.com",
-    name : "Wah Gwan app",
-    message : "I am going to" + testwin.myvar +"using Wah Gwan",
-    caption : "Wah Gwan app",
-    picture : "http://developer.appcelerator.com/assets/img/DEV_titmobile_image.png",
-    description : "Use Wah Gwan on android and iOS to view events happening near you..."
+    name : "Wha Gwan app",
+    message : "I am going to using Wah Gwan",
+    caption : "Wha Gwan app",
+    picture : "http://whagwanapp.com/Photos/logo.png",
+    description : "Use Wha Gwan on android and iOS to view events happening near you..."
 };
 fb.dialog("feed", data, function(e) {
     if(e.success && e.result) {
@@ -519,6 +727,17 @@ height: '120dp',
 width: '140dp'
 });
 
+var mapview_b = Map.createView({
+	top: 0,
+	left: 0,
+	height: Ti.UI.FILL,
+	width: Ti.UI.FILL,
+    mapType: Map.NORMAL_TYPE,
+    regionFit:true,
+    userLocation:true
+    });
+
+
 var location = Ti.UI.createView({
 top : '10dp',
 left: '160dp',
@@ -529,6 +748,8 @@ backgroundColor: '#FFFFFF',
 borderColor: '#D7D4d8',
 borderWidth: 5
 });
+
+location.add(mapview_b);
 var loclabel = Ti.UI.createLabel({
 font: 5,
 height: '120dp',
@@ -605,7 +826,7 @@ testwin.add(fbshare);
 	  				for (var j = 0 ; j < piecesArray.length ; j++)
 	  				{
 	  					EDarray.push(piecesArray[j]);
-	  				//	Ti.API.info(j + piecesArray[j]);
+	  					Ti.API.info(j + piecesArray[j]);
 	  				}    
 	  				
 	  				
@@ -615,9 +836,28 @@ testwin.add(fbshare);
 	  		adLabel.text = EDarray[4];
 	  		loclabel.text = testwin.myvar;
 	  		var imageName = EDarray[5];
+	  		var current = {
+	  			latitude: EDarray[7],
+	  			longitude: EDarray[6],
+	  			latitudeDelta: 0.05,
+	  			longitudeDelta: 0.05
+	  		};
+	  		var pin_b = Map.createAnnotation({
+			latitude: EDarray[7],
+			longitude:EDarray[6],
+			title:"Your Location",
+			pincolor:Map.ANNOTATION_RED,
+			myid:2,
+			});
+	  		mapview_b.hide();
+	  		mapview_b.addAnnotation(pin_b);
+	  		mapview_b.setLocation(current);
+	  		mapview_b.show();
+	  		
+		
 	  		var appUrl = "http://whagwanapp.com/Photos/";
 	  		var imagepath = appUrl + imageName;
-	  		circle.image = imagepath;
+	  		circle.image = imagepath; 
 	        } 
 	        else
 	        {
@@ -644,67 +884,98 @@ NavGroup.openWindow(testwin, {animated:true});
 	} catch(e) {
 	    Ti.API.error('Error: ' + e);
 	}
-
 events.add(iconScroll); 
 }
-
-	
 
 //*********************************//
 //DRAWER CODE STARTS FROM HERE//
 //*********************************//
 
 var interestButton = Ti.UI.createButton({
-	top: 40,
-	backgroundImage: 'interest.png',
-	width: Ti.UI.FILL,
-	height: Ti.UI.SIZE
+	top: 60,
+	backgroundImage: 'Interest.png',
+	title: 'Interest',
+	color: '#000000',
+	width: 180,
+	height: 40
 	});
 	
 interestButton.addEventListener('click', function(e){
 	
-	if (drawer.toggle == true){drawer.toggle = false;}
-	else{drawer.toggle = true;}
+	if (drawer.toggle == true)
+	{
+		MoveLeft();
+		drawer.toggle = false;
+	}
+	else
+	{	
+		MoveRight();
+		drawer.toggle = true;
+	}
+		
+		
 	drawer.close();
-	NavGroup.left = 0;
+	//NavGroup.left = 0;
+	iconScroll.removeAllChildren();
+	events.remove(iconScroll);
 	events.close();
-	Location.close();
+	//Location.close();
 	NavGroup.openWindow(Interests);
 });
 
 
 var homeButton = Ti.UI.createButton({
-	top: 80,
-	backgroundImage: 'home.png',
-	width: Ti.UI.FILL,
-	height: Ti.UI.SIZE
+	top: 110,
+	backgroundImage: 'Home.png',
+	title: 'Home',
+	color: '#000000',
+	width: 180,
+	height: 40
 	});
 	
 homeButton.addEventListener('click', function(e){
-	if (drawer.toggle == true){drawer.toggle = false;}
-	else{drawer.toggle = true;}
+	if (drawer.toggle == true)
+	{
+		drawer.toggle = false;
+		MoveLeft();
+	}
+	else
+	{
+		drawer.toggle = true;
+		MoveRight();
+	}
 	
 	drawer.close();
-	NavGroup.left = 0;
-	Interests.close();
-	Location.close();
+	//NavGroup.left = 0;
+	//Interests.close();
+	//Location.close();
 	NavGroup.openWindow(events);
 });
 
 var locButton = Ti.UI.createButton({
-	top: 120,
-	backgroundImage: 'location.png',
-	width: Ti.UI.FILL,
-	height: Ti.UI.SIZE
+	top: 160,
+	backgroundImage: 'Location.png',
+	title: 'Location',
+	color: '#000000',
+	width: 180,
+	height: 40
 	});
 	
 locButton.addEventListener('click', function(e){
 	
-	if (drawer.toggle == true){drawer.toggle = false;}
-	else{drawer.toggle = true;}
+	if (drawer.toggle == true)
+	{
+		drawer.toggle = false;
+		MoveLeft();
+	}
+	else
+	{
+		drawer.toggle = true;
+		MoveRight();
+	}
 	drawer.close();
 	NavGroup.left = 0;
-	Interests.close();
+	//Interests.close();
 	events.close();
 	NavGroup.openWindow(Location);
 });
@@ -715,82 +986,98 @@ drawer.add(interestButton);
 //*********************************//
 //INTEREST CODE STARTS FROM HERE//
 //*********************************//
+var backButtonInterest = Ti.UI.createButton({
+	title: 'Events'	
+});
+
+backButtonInterest.addEventListener('click', function(e){
+	intrestsSend = '';
+	var db_C = Ti.Database.open('interest');
+	var FollowingInterests = db_C.execute('SELECT * FROM Userint');
+	while (FollowingInterests.isValidRow()){
+				var interestsString = FollowingInterests.fieldByName('interestfollow');
+				intrestsSend = intrestsSend + interestsString + '%';
+				//Ti.API.log(intrestsSend);
+				FollowingInterests.next();
+				}
+	viewInterest.removeAllChildren();
+	Interests.close();
+	NavGroup.openWindow(events);
+	//Ti.API.log(intrestsSend);
+	//db_C.execute('DELETE from Userint');
+	//db_C.execute('DELETE from Int');
+	db_C.close();
+	GetEvents();
+});
+
+Interests.leftNavButton = backButtonInterest;
 
 var viewInterest = Ti.UI.createView();
+var interestbuttons = [];
 
-var chooseinterests = Ti.UI.createLabel({
-	top: 40,
-	text: 'PLEASE CHOOSE YOUR INTERESTS'
-}); 
-
-var interestScroll_b = Ti.UI.createScrollView({
-scrollType:'vertical',
-left: 0,
-width:320,
-top: 190,
-height: 160,
-showVerticalScrollIndicator: true
-	});
-
-var url = "http://whagwanapp.com/webservice3.asmx";
-	var callparams_d = {
-       	   
-	};
-	
-	var suds_d = new SudsClient({
-	    endpoint: url,
-	    targetNamespace: 'http://whagwanapp.com/'
-	});
-	
-	try {
-	    suds_d.invoke('HelloWorld', callparams_d, function(xmlDoc) {
-	        var results = xmlDoc.documentElement.getElementsByTagName('HelloWorldResult');
-	        if (results && results.length>0) 
-	        {		var result = results.item(0).text;
-	        		var interestList = result.split('/');
-	        		for (var i = 0; i < interestList.length; i++)
-	          	{
-	          			var btnH = '30';
-	          			
-					var topValue = 10 + (btnH * i);
-					GetInterests[i] = Ti.UI.createButton({
-					color: '#000000',
-					title: interestList[i],
-					top: topValue,
-					left: 30,
-					height: btnH,
-					width: 260,
-					backgroundImage: 'eventsButton.png',
-					following: 'false'
-					});
-			interestScroll_b.add(GetInterests[i]);  
-	  			
-	  		GetInterests[i].addEventListener('click', function(e){
-	  		if (e.source.following == 'false'){
-	  			e.source.backgroundImage = 'boxx.png';
-	  			e.source.following  = 'true';
-	  		}
-			else 
-			{
-				e.source.backgroundImage = 'eventsButton.png';
-				e.source.following  = 'false';	
+Interests.addEventListener('open', function(e) {	
+	var db_B = Ti.Database.open('interest');
+	var interestCount = 1;
+	var RowsButton = db_B.execute('SELECT * FROM Int');
+	while (RowsButton.isValidRow()){
+		var name = RowsButton.fieldByName('Name');
+		var btnH = '30';
+	    var topValue = 10 + (btnH * interestCount);
+		interestbuttons[interestCount] = Ti.UI.createButton({
+			color: '#000000',
+			title: name,
+			top: topValue,
+			left: 30,
+			height: btnH,
+			width: 260,
+			backgroundImage: 'eventsButton.png',
+			editable: true,
+			follow: 'false'
+			});
+			
+			var FollowingButtons = db_B.execute('SELECT * FROM Userint');
+			while (FollowingButtons.isValidRow()){
+				var green = FollowingButtons.fieldByName('interestfollow');
+				if (green == name){
+					interestbuttons[interestCount].backgroundImage = 'boxx.png';
+					interestbuttons[interestCount].follow = "true";
+				}
+				else{
+				
+				}
+			FollowingButtons.next();
 			} 
-	
-			}); 
-	        } 
-	       
-	        }
-     else
-	        {
-	        //   Ti.API.log (results.item(0));
-	        }
-	    });
-	} catch(e) {
-	    Ti.API.error('Error: ' + e);
+			
+			interestbuttons[interestCount].addEventListener('click', function(e){
+				if (e.source.follow == 'true'){
+					e.source.follow = "false";
+					e.source.backgroundImage = 'eventsButton.png';
+					var deleteInterest = e.source.title;
+					Ti.API.log(deleteInterest);
+					//var Rows = db.execute('SELECT * FROM Userint where interestfollow = "'+ userInterests[i] +'" ');
+					var db_D = Ti.Database.open('interest');
+					db_D.execute('DELETE FROM Userint WHERE interestfollow= "'+ deleteInterest +'"');
+					db_D.close();
+				}
+				else{
+					e.source.follow = "true";
+					e.source.backgroundImage = 'boxx.png';
+					var addInterest = e.source.title;
+					Ti.API.log(addInterest);
+					//db_B.execute('INSERT INTO Userint(interestfollow) VALUES (?)',e.source.title);
+					var db_D = Ti.Database.open('interest');
+					db_D.execute('INSERT into Userint(interestfollow) VALUES("'+ addInterest +'")');
+					db_D.close();
+				}
+			});
+			
+			viewInterest.add(interestbuttons[interestCount]); 
+			interestCount = interestCount + 1;
+			RowsButton.next();
 	} 
 
-viewInterest.add(chooseinterests);
-viewInterest.add(interestScroll_b); 
+
+db_B.close();});
 Interests.add(viewInterest);
 
 //*********************************//
@@ -812,25 +1099,49 @@ var label = Ti.UI.createLabel({
 	width: Ti.UI.FILL
 });
 
+  var e_longitude;
+  var e_latitude;
+Titanium.Geolocation.purpose = "GPS user coordinates";
+Titanium.Geolocation.distanceFilter = 10; // set the granularity of the location event
+
+    Titanium.Geolocation.getCurrentPosition(function(e)
+    {
+        if (e.error)
+        {
+               // manage the error
+               return;
+        }
+
+    	e_longitude = e.coords.longitude;
+        e_latitude = e.coords.latitude;
+        var altitude = e.coords.altitude;
+        var heading = e.coords.heading;
+        var accuracy = e.coords.accuracy;
+        var speed = e.coords.speed;
+        var timestamp = e.coords.timestamp;
+        var altitudeAccuracy = e.coords.altitudeAccuracy;
+
+    });
+
 var mapview = Map.createView({
 	top: 80,
 	left: 40,
 	height: 280,
 	width: 240,
     mapType: Map.NORMAL_TYPE,
-    region: {latitude:33.586283, longitude:73.088372,
+    region: {latitude:e_latitude, longitude:e_longitude,
             latitudeDelta:0.01, longitudeDelta:0.01},
     animate:true,
     regionFit:true,
     userLocation:true
     });
 
-var  currentRegion = Ti.UI.createButton({
+/*var  currentRegion = Ti.UI.createButton({
 	title: 'Confirm Region',
 	backgroundImage: 'next.png',
 	top: 380,
 	left: 10
-});
+}); */
 
 var proceed = Ti.UI.createButton({
 	title: 'Proceed',
@@ -845,12 +1156,11 @@ longitude:73.088372,
 title:"Your Location",
 pincolor:Map.ANNOTATION_RED,
 myid:2,
-draggable : true
 });
 
 mapview.addAnnotation(pin);
 
-currentRegion.addEventListener('click', function()
+/*currentRegion.addEventListener('click', function()
 {	
 //	if (maptoggle == false){
 	maptoggle = true;
@@ -863,7 +1173,7 @@ currentRegion.addEventListener('click', function()
 //		alert("You have already specified the region");
 //	}
 }
-);
+);*/
 
 proceed.addEventListener('click', function()
 {	
@@ -874,30 +1184,18 @@ proceed.addEventListener('click', function()
 
 view.add(label);
 view.add(mapview);
-view.add(currentRegion);
+//view.add(currentRegion);
 view.add(proceed);
 Location.add(view);
-
+//view.removeAllChildren();
 var mapbackbutton = Ti.UI.createButton({
-backgroundImage: 'sliderbutton.png',
-height: '10dp',
-width: '10dp',
-toggle: false
+title: 'Events'
 });
 
 mapbackbutton.addEventListener('click', function(e){
-	if (drawertoggle == false){
-		drawertoggle = true;
-		drawer.open();	
-		NavGroup.left= 180;
-		
-		}
-	else{
-		drawertoggle = false;
-		drawer.close();
-		NavGroup.left= 0;
-		}
-
+Location.close();
+NavGroup.openWindow(events);
 }); 
 
 Location.leftNavButton = mapbackbutton; 
+
