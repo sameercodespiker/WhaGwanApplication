@@ -1,12 +1,12 @@
 Ti.include('suds.js');
-
+//joji
 Ti.Database.install('InterestDB.sqlite', 'interest');
 
 var AppStart = 'false';
 
 var loginWin = Ti.UI.createWindow({
  	backgroundImage: 'bg.png',
-    title: 'WHA GAWAN',
+    title: 'WHA GWAN',
     barImage : 'orange.png'
 });
 
@@ -16,9 +16,11 @@ var intrestsSend = '';
 	window: loginWin,
 }); */
 
+
+ 
 var events = Ti.UI.createWindow({
 	backgroundImage: 'bg.png',
-    title: 'WHA GAWAN',
+    title: 'WHA GWAN',
     barImage : 'orange.png',
     myvar: ''
 });
@@ -43,13 +45,13 @@ var drawer = Ti.UI.createWindow({
 
 var Interests = Ti.UI.createWindow({
 	backgroundImage: 'bg.png',
-    title: 'WAH GAWAN',
+    title: 'WHA GWAN',
     barImage : 'orange.png'
 });
 
 var Location = Ti.UI.createWindow({
 	backgroundImage: 'bg.png',
-    title: 'WAH GAWAN',
+    title: 'WHA GWAN',
     barImage : 'orange.png'
 });
 
@@ -79,26 +81,44 @@ var imageview = [];
 
 if (Ti.App.Properties.getString('AppStart') == null)
 {
-	var NavGroup = Ti.UI.iOS.createNavigationWindow({
+	//loginWin.open();
+	var NavGroup_b = Ti.UI.iOS.createNavigationWindow({
 	window: loginWin
+	});
+	setTimeout(function(){
+	NavGroup_b.open();
+	}, 3000);
+	
+	var NavGroup = Ti.UI.iOS.createNavigationWindow({
+	window: events
 	});
 	Ti.API.log(Ti.App.Properties.getString('AppStart'));
 	Ti.App.Properties.setString('AppStart', 'true');
 	Ti.API.log(Ti.App.Properties.getString('AppStart'));
 	}
-else{
-var NavGroup = Ti.UI.iOS.createNavigationWindow({
-window: events
-});
-GetEvents();
+else
+{ 
+	var NavGroup = Ti.UI.iOS.createNavigationWindow({
+	window: events
+	});
+	GetEvents();
+	setTimeout(function(){
+	NavGroup.open();
+	}, 3000);
+
 } 
 
 function getGoing( a, b){
+	var db_e = Ti.Database.open('interest');	
+	var Rows = db_e.execute('SELECT * FROM AppUser');
+	var Uname = Rows.fieldByName('username');
+	db_e.close(); 
 	
 	var url_abc = "http://whagwanapp.com/webservice5.asmx";
 	var callparams_abc = {
 		un: b,
-	   	sig : 'count'
+	   	sig : 'count',
+	   	username: Uname
 	};
 
 	var suds_abc = new SudsClient({
@@ -112,7 +132,7 @@ function getGoing( a, b){
 	        	if (results_abc && results_abc.length>0) {
 	            	var result_abc = results_abc.item(0).text;
 	            	var goingCount = result_abc;
-	            	Ti.API.log("Going:" + goingCount);
+	            	//Ti.API.log("Going: " + goingCount);
 	            	gg[a] = Titanium.UI.createLabel({
 					backgroundColor:'transparent',
 					width:'30',
@@ -123,6 +143,56 @@ function getGoing( a, b){
 					text: goingCount
 					});
 					eve[a].add(gg[a]);     
+					
+	            	}
+				 else
+	        {
+	             Ti.API.log('Nai chala');	
+	        }
+
+  
+	    });
+	
+	} catch(e) {
+	    Ti.API.error('Error: ' + e);
+	}
+}
+
+function getInterested( a, b){
+	var db_z = Ti.Database.open('interest');	
+	var Rows = db_z.execute('SELECT * FROM AppUser');
+	var Uname = Rows.fieldByName('username');
+	db_z.close(); 
+	
+	var url_abc = "http://whagwanapp.com/webservice5.asmx";
+	var callparams_abc = {
+		un: b,
+	   	sig : 'getInterested',
+	   	username : Uname
+	};
+
+	var suds_abc = new SudsClient({
+	    endpoint: url_abc,
+	    targetNamespace: 'http://whagwanapp.com/'
+	});
+	
+	try {
+	    	suds_abc.invoke('HelloWorld', callparams_abc, function(xmlDoc) {
+	        var results_abc = xmlDoc.documentElement.getElementsByTagName('HelloWorldResult');
+	        	if (results_abc && results_abc.length>0) {
+	            	var result_abc = results_abc.item(0).text;
+	            	var interestedCount = result_abc;
+	            	//Ti.API.log("Interested:" + interestedCount);
+	            	interPeople[a] = Titanium.UI.createLabel({
+					backgroundColor:'transparent',
+					width:'50',
+					height:'10',
+					right:5,
+					bottom: 5,
+					text: interestedCount,
+					minimumFontSize: 4
+					});
+					eve[a].add(interPeople[a]);  
 
 	            	}
 				 else
@@ -145,6 +215,7 @@ var db_C = Ti.Database.open('interest');
 	db_C.execute('DELETE from Userint');
 	db_C.execute('DELETE from Int');
 });*/
+
 
 var view = Ti.UI.createView();
 
@@ -227,12 +298,14 @@ var url = "http://whagwanapp.com/webservice3.asmx";
 						var Rows = db_a.execute('SELECT * FROM Int where Name = "'+ interestList[i] +'" ');
 						if(Rows.isValidRow()){
     					//	Ti.API.log("Exists");
+    					db_a.close(); 
 						}
 						else {
 							db_a.execute('INSERT into Int(Name) VALUES("'+ interestList[i] +'")');
 							Ti.API.log("Insert");
+							db_a.close(); 
 						}
-						db_a.close(); 
+						
 	          			var btnH = '30';
 	          			var topValue = 10 + (btnH * i);
 	          			
@@ -297,10 +370,12 @@ button.addEventListener('click', function(e){
 					if(Rows.isValidRow()){
     				//means you already have it in your favorites
     					Ti.API.log("ExistsInAPPUser");
+    					db.close();
 					}
 					else { 
 						db.execute('INSERT into AppUser(username) VALUES("'+ UN +'")');
 						Ti.API.log("InsertInAPPUser");
+						db.close();
 					}
 if (username.hasText() == false || pass.hasText() == false )
 {
@@ -337,18 +412,19 @@ else
 					if(Rows.isValidRow()){
     				//means you already have it in your favorites
     					Ti.API.log("ExistsInUser");
+    					db.close(); 
 					}
 					else { 
 						db.execute('INSERT into Userint(interestfollow) VALUES("'+ userInterests[i] +'")');
 						Ti.API.log("InsertInUser");
+						db.close(); 
 					}
-					db.close(); 
+					
 	 				intrestsSend = intrestsSend + userInterests[i] + '%';
 	 }
 	
 	
-	
-	NavGroup.openWindow(Location, {animated:true});
+
 	//
 	
 	var url_e = "http://whagwanapp.com/webservice4.asmx";
@@ -376,8 +452,12 @@ else
 
 	catch(e) {
 	    Ti.API.error('Error: ' + e);
-	}  
+	} 
+	 
 
+NavGroup_b.openWindow(Location);
+//Location.open();
+loginWin.close();
 }});
 
 view.add(username);
@@ -388,7 +468,7 @@ view.add(pass);
 view.add(button);
 view.add(interestScroll);
 loginWin.add(view);
-NavGroup.open();
+
 
 //*********************************//
 //EVENT LIST CODE STARTS FROM HERE//
@@ -506,20 +586,10 @@ eventtitle[i]= Titanium.UI.createLabel({
 });
 eve[i].add(eventtitle[i]);
 eve[i].buttonname = buttonProperties[0];
-
-interPeople[i] = Titanium.UI.createLabel({
-		backgroundColor:'transparent',
-		width:'50',
-		height:'10',
-		right:5,
-		bottom: 5,
-		text:'0 interested',
-		minimumFontSize: 4
-	});
 	
-eve[i].add(interPeople[i]);
 var nametoSend = buttonProperties[0];
 getGoing(i, nametoSend);
+getInterested(i, nametoSend);
 //Ti.API.log("Going:" + goingCount);
 
 
@@ -535,26 +605,46 @@ events.addEventListener('click', function(e){
 //EVENT DETAIL CODE STARTS FROM HERE//
 //*********************************//
 
+
+
 eve[i].addEventListener('click', function(e)
 {
+	if (drawer.toggle == true)
+	{
+		return;
+	}
 
-if (drawer.toggle == true)
-{
-	return;
-}
+	var db_g = Ti.Database.open('interest');	
+	var Rows_g = db_g.execute('SELECT * FROM AppUser');
+	var Username = Rows_g.fieldByName('username');
+	var EventName = e.source.buttonname;
+	Ti.API.log("Checking username and Event: " + EventName + " " + Username);
+	var CheckUserForEvent = db_g.execute('SELECT UName FROM EventsInterested where EName = "' + EventName + '" ');
+	var CheckUser = CheckUserForEvent.fieldByName('UName');
+	if(CheckUser == Username)
+	{
+		Ti.API.log(CheckUser + "  " + Username + "  Already Interested Events");
+		db_g.close();
+	}
 
- var url_abc = "http://whagwanapp.com/webservice5.asmx";
- var callparams_abc = {
-		un: e.source.buttonname,
-	   	sig : 'insertInterested'
-	};
+	else{	
+		    Ti.API.log("Inserting Interested Events");
+			db_g.execute('INSERT into EventsInterested(UName, EName) VALUES("'+ Username +'", "'+ EventName +'" )');
+			db_g.close();
+		
+		 	var url_abc = "http://whagwanapp.com/webservice5.asmx";
+ 			var callparams_abc = {
+			un: e.source.buttonname,
+	   		sig : 'insertInterested',
+	   		username : Username
+		};
 
-var suds_abc = new SudsClient({
+	var suds_abc = new SudsClient({
 	    endpoint: url_abc,
 	    targetNamespace: 'http://whagwanapp.com/'
 	});
 	
-try {
+	try {
 	  suds_abc.invoke('HelloWorld', callparams_abc, function(xmlDoc) {
 	  var results_abc = xmlDoc.documentElement.getElementsByTagName('HelloWorldResult');
 	  if (results_abc && results_abc.length>0) {
@@ -571,10 +661,12 @@ try {
 	} catch(e) {
 	    Ti.API.error('Error: ' + e);
 	}
+}
+
 
 var testwin = Ti.UI.createWindow({
 backgroundImage: 'bg.png',
-    title: 'WAH GAWAN',
+    title: 'WHA GWAN',
     barImage : 'orange.png',
     myvar:''
 });
@@ -587,6 +679,9 @@ title: 'Events'
 
 BackButton.addEventListener('click', function(e){
 	testwin.close();
+	
+	NavGroup.openWindow(events);
+	GetEvents();
 });
 testwin.leftNavButton = BackButton;
 
@@ -611,66 +706,6 @@ center: {x:'160dp' , y:'210dp'}
 var going = false;
 
 
-var db_e = Ti.Database.open('interest');	
-var Rows = db_e.execute('SELECT username FROM AppUser');
-Ti.API.log(Rows);
-db_e.close(); 
-
-var join = Ti.UI.createLabel({
-			text:'JOIN',
-			color:'blue',
-			font:{fontSize:14}
-});
-testwin.rightNavButton = join;
-	
-join.addEventListener('click', function(e) {
-if (going == false)
-    {
-	going = true;
-    join.text = 'GOING';
-    join.color= 'green';
-   Ti.API.log(testwin.myvar);
-    var url_abc = "http://whagwanapp.com/webservice5.asmx";
-	var callparams_abc = {
-		un: testwin.myvar,
-	   	sig : 'insert'
-	};
-
-	var suds_abc = new SudsClient({
-	    endpoint: url_abc,
-	    targetNamespace: 'http://whagwanapp.com/'
-	});
-	
-	try {
-	    	suds_abc.invoke('HelloWorld', callparams_abc, function(xmlDoc) {
-	        var results_abc = xmlDoc.documentElement.getElementsByTagName('HelloWorldResult');
-	        	if (results_abc && results_abc.length>0) {
-	            	var result_abc = results_abc.item(0).text;
-	            	var goingCount = result_abc;
-	            	Ti.API.log("Done " + goingCount);
-	           
-	            	}
-				 else
-	        {
-	             Ti.API.log('Nai chala');	
-	        }
-
-  
-	    });
-	
-	} catch(e) {
-	    Ti.API.error('Error: ' + e);
-	}
-    
-    }
-else
-    {
-    going = false;
-    join.text = 'JOIN';
-    join.color= 'blue';
-    }
-});
-
 
 var fbshare = Ti.UI.createButton({
 backgroundImage: 'fb.png',
@@ -681,12 +716,12 @@ width: Ti.UI.FILL
 
 fbshare.addEventListener('click', function(e){
 		var fb = require('facebook');
-fb.appid = 558174570963142;
-fb.permissions = ['publish_stream'];
-fb.addEventListener('login', function(e) {
-    if (e.success) {
-        alert('Logged in');
-    }
+		fb.appid = 558174570963142;
+		fb.permissions = ['publish_stream'];
+		fb.addEventListener('login', function(e) {
+   		 if (e.success) {
+       	// alert('Logged in');
+}
 });
 
 	fb.authorize();
@@ -694,7 +729,7 @@ fb.addEventListener('login', function(e) {
 var data = {
     link : "http://www.codespikestudios.com",
     name : "Wha Gwan app",
-    message : "I am going to using Wah Gwan",
+    message : "I am going to using Wha Gwan",
     caption : "Wha Gwan app",
     picture : "http://whagwanapp.com/Photos/logo.png",
     description : "Use Wha Gwan on android and iOS to view events happening near you..."
@@ -702,11 +737,16 @@ var data = {
 fb.dialog("feed", data, function(e) {
     if(e.success && e.result) {
        // alert("Success! New Post ID: " + e.result);
-    } else {
-        if(e.error) {
-            alert(e.error);
-        } else {
-            alert("User canceled dialog.");
+    } 
+    else 
+    	{
+        if(e.error) 
+        {
+            //alert(e.error);
+        } 
+        else 
+        {
+            //alert("User canceled dialog.");
         }
     }
 });
@@ -733,8 +773,7 @@ var mapview_b = Map.createView({
 	height: Ti.UI.FILL,
 	width: Ti.UI.FILL,
     mapType: Map.NORMAL_TYPE,
-    regionFit:true,
-    userLocation:true
+    regionFit:true
     });
 
 
@@ -793,6 +832,53 @@ location.add(loclabel);
 ameties.add(amlabel);
 admission.add(adLabel);
 
+info.addEventListener('click', function(e){
+	var infoWin = Ti.UI.createWindow({
+	backgroundColor: '#FFFFFF',
+    title: 'WHA GWAN',
+    barImage : 'orange.png'
+	});
+	var winlabel = Ti.UI.createLabel({
+	text: infolabel.text
+});
+
+	infoWin.add(winlabel);
+
+	infoWin.backButtonTitle = 'Back';
+	NavGroup.openWindow(infoWin);
+});
+
+ameties.addEventListener('click', function(e){
+	var infoWin = Ti.UI.createWindow({
+	backgroundColor: '#FFFFFF',
+    title: 'WHA GWAN',
+    barImage : 'orange.png'
+	});
+	var winlabel = Ti.UI.createLabel({
+	text:amlabel.text
+	});
+
+	infoWin.add(winlabel);
+	infoWin.backButtonTitle = 'Back';
+	NavGroup.openWindow(infoWin);
+});
+
+admission.addEventListener('click', function(e){
+	var infoWin = Ti.UI.createWindow({
+	backgroundColor: '#FFFFFF',
+    title: 'WHA GWAN',
+    barImage : 'orange.png'
+	});
+	var winlabel = Ti.UI.createLabel({
+	text:adLabel.text
+	});
+
+	infoWin.add(winlabel);
+	infoWin.backButtonTitle = 'Back';
+	NavGroup.openWindow(infoWin);
+});
+
+
 
 testwin.add(admission);
 testwin.add(ameties);
@@ -826,7 +912,7 @@ testwin.add(fbshare);
 	  				for (var j = 0 ; j < piecesArray.length ; j++)
 	  				{
 	  					EDarray.push(piecesArray[j]);
-	  					Ti.API.info(j + piecesArray[j]);
+	  				//	Ti.API.info(j + piecesArray[j]);
 	  				}    
 	  				
 	  				
@@ -834,18 +920,18 @@ testwin.add(fbshare);
 	  		infolabel.text = EDarray[0] + "  "+ "DATE: " + EDarray[2] + "  " + "TIME: " + EDarray [3];
 	  		amlabel.text = EDarray[1];
 	  		adLabel.text = EDarray[4];
-	  		loclabel.text = testwin.myvar;
+	  		//loclabel.text = testwin.myvar;
 	  		var imageName = EDarray[5];
+	  		var urlLink = EDarray[8];
 	  		var current = {
 	  			latitude: EDarray[7],
 	  			longitude: EDarray[6],
-	  			latitudeDelta: 0.05,
-	  			longitudeDelta: 0.05
+	  			latitudeDelta: 0.01,
+	  			longitudeDelta: 0.01
 	  		};
 	  		var pin_b = Map.createAnnotation({
 			latitude: EDarray[7],
 			longitude:EDarray[6],
-			title:"Your Location",
 			pincolor:Map.ANNOTATION_RED,
 			myid:2,
 			});
@@ -853,23 +939,219 @@ testwin.add(fbshare);
 	  		mapview_b.addAnnotation(pin_b);
 	  		mapview_b.setLocation(current);
 	  		mapview_b.show();
-	  		
-		
+			
+			var mapview_c = Map.createView({
+				top: 0,
+				left: 0,
+				height: Ti.UI.FILL,
+				width: Ti.UI.FILL,
+   				mapType: Map.NORMAL_TYPE,
+    			regionFit:true
+   			 });
+			
+			
+			mapview_c.setLocation(current);
+			
 	  		var appUrl = "http://whagwanapp.com/Photos/";
 	  		var imagepath = appUrl + imageName;
 	  		circle.image = imagepath; 
-	        } 
-	        else
+	  		
+	 		 		
+	  		circle.addEventListener('click', function(e){
+  				if (urlLink=="")
+  				{	var imageview = Ti.UI.createImageView({
+  						image: imagepath,
+  						center: {x: "50%", y: "50%"},
+  						width: 250,
+  						height: 250
+  						});
+ 
+  					var imageWindow = Ti.UI.createWindow({
+  						backgroundColor: '#FFFFFF',
+    					title: 'WHA GWAN',
+    					barImage : 'orange.png'
+  					});
+  					
+  					imageWindow.add(imageview);
+  					imageWindow.backButtonTitle = "Back";
+  					NavGroup.openWindow(imageWindow);
+	  				Ti.API.log("URL" + urlLink);
+	  			/*	var webview = Ti.UI.createWebView();
+					webview.url = imagepath;
+					testwin.add(webview);
+					testwin.open(webview); */
+	  			}
+	  			else
+	  			{
+	  				Ti.API.log(urlLink);
+	  				var webview = Ti.UI.createWebView();
+					webview.url = urlLink;
+					testwin.add(webview);
+					testwin.open(webview);
+				}	
+	  		});
+
+
+ location.addEventListener('click', function(e){
+	 var infoWin = Ti.UI.createWindow({
+     title: 'WAH GWAN'
+	 });
+	 
+	mapview_c.addAnnotation(pin_b);
+ 	infoWin.add(mapview_c);
+ 		 
+	 infoWin.backButtonTitle = 'Back';
+	 NavGroup.openWindow(infoWin, {animated:true});
+ });
+  		
+//***IMPLEMENTING JOIN*****//
+	  		
+var db_e = Ti.Database.open('interest');	
+var Rows = db_e.execute('SELECT * FROM AppUser');
+var Uname = Rows.fieldByName('username');
+Ti.API.log("Checking Rows :" + Uname);
+Ti.API.log("Checking EventName :" + EDarray[0]);
+db_e.close(); 
+
+var join = Ti.UI.createLabel({
+	text: 'JOIN',
+	color: 'blue',
+	joined: false
+});
+
+join.addEventListener('click', function(e) {
+if (e.source.joined == false)
+    {
+	e.source.joined = true;
+    join.text = 'GOING';
+    join.color= 'green';
+    Ti.API.log("if statement chal rai hai");
+
+    
+   var db_i = Ti.Database.open('interest');	
+   db_i.execute('INSERT into EventsGoing(UName, EName) VALUES("'+ Uname +'", "'+ testwin.myvar +'" )');
+   db_i.close();
+    Ti.API.log("what is testwin" + testwin.myvar);
+    var url_abc = "http://whagwanapp.com/webservice5.asmx";
+	var callparams_abc = {
+		un: testwin.myvar,
+	   	sig : 'insert',
+	   	username: Uname
+	};
+
+	var suds_abc = new SudsClient({
+	    endpoint: url_abc,
+	    targetNamespace: 'http://whagwanapp.com/'
+	});
+	
+	try {
+	    	suds_abc.invoke('HelloWorld', callparams_abc, function(xmlDoc) {
+	        var results_abc = xmlDoc.documentElement.getElementsByTagName('HelloWorldResult');
+	        	if (results_abc && results_abc.length>0) 
+	        		{
+	            	var result_abc = results_abc.item(0).text;
+	            	var goingCount = result_abc;
+	            	Ti.API.log("Done " + goingCount);
+	            	}
+				 else
 	        {
-	            EDlabel.text = 'Oops, could not determine result of SOAP call.';
+	             Ti.API.log('Nai chala');	
 	        }
+
+  
 	    });
 	
 	} catch(e) {
 	    Ti.API.error('Error: ' + e);
 	}
+    
+    }
+else
+    {
+    var db_f = Ti.Database.open('interest');	
+   	db_f.execute('DELETE FROM EventsGoing where EName = "' + testwin.myvar + '" ');
+   	db_f.close();
+    Ti.API.log("else statement chal rai hai");
+    e.source.joined = false;
+    join.text = 'JOIN';
+    join.color= 'blue';
+    
+    var url_abc = "http://whagwanapp.com/webservice5.asmx";
+	var callparams_abc = {
+		un: testwin.myvar,
+	   	sig : 'deleteGoing',
+	   	username: Uname
+	};
+
+	var suds_abc = new SudsClient({
+	    endpoint: url_abc,
+	    targetNamespace: 'http://whagwanapp.com/'
+	});
 	
-NavGroup.openWindow(testwin, {animated:true});
+	try {
+	    	suds_abc.invoke('HelloWorld', callparams_abc, function(xmlDoc) {
+	        var results_abc = xmlDoc.documentElement.getElementsByTagName('HelloWorldResult');
+	        	if (results_abc && results_abc.length>0) 
+	        		{
+	            	var result_abc = results_abc.item(0).text;
+	            	var goingCount = result_abc;
+	            	Ti.API.log("Done " + goingCount);
+	            	}
+				 else
+	        {
+	             Ti.API.log('Nai chala');	
+	        }
+
+  
+	    });
+	
+	} catch(e) {
+	    Ti.API.error('Error: ' + e);
+	}
+    
+    }
+});
+
+
+	var db_a = Ti.Database.open('interest');	
+	var Rows_b = db_a.execute('SELECT UName FROM EventsGoing where EName = "' + EDarray[0] + '" ');
+	if(Rows_b.isValidRow()){
+	var nameCheck = Rows_b.fieldByName('UName');
+		if (nameCheck == Uname)
+		{
+		join.text = "GOING";
+		join.color = "green";
+		join.joined = true;
+		testwin.rightNavButton = join;
+		Ti.API.log(" User and Event Exists");
+		}
+		else {
+		testwin.rightNavButton = join;
+		Ti.API.log("User and Event does not Exists");	
+		}	
+		}
+	else {
+	//db_a.execute('INSERT into EventGoing(UName, EName) VALUES("'+ Uname+'", "'+ EDarray[0] +'" )');
+	testwin.rightNavButton = join;
+	Ti.API.log("Insert Event and Event didnt exist");
+	}
+	db_a.close(); 
+	  		
+} 
+else
+{
+ EDlabel.text = 'Oops, could not determine result of SOAP call.';
+}
+});
+	
+} catch(e) {
+Ti.API.error('Error: ' + e);
+} 
+
+iconScroll.removeAllChildren();
+events.close();	
+NavGroup.openWindow(testwin);
+
 //NavGroup.openWindow(eventdetail, {animated:true});
 //Ti.API.log(eventdetail.myvar);
 }); 
@@ -884,6 +1166,10 @@ NavGroup.openWindow(testwin, {animated:true});
 	} catch(e) {
 	    Ti.API.error('Error: ' + e);
 	}
+	
+
+
+	
 events.add(iconScroll); 
 }
 
@@ -1012,7 +1298,7 @@ backButtonInterest.addEventListener('click', function(e){
 
 Interests.leftNavButton = backButtonInterest;
 
-var viewInterest = Ti.UI.createView();
+var viewInterest = Ti.UI.createScrollView();
 var interestbuttons = [];
 
 Interests.addEventListener('open', function(e) {	
@@ -1178,7 +1464,10 @@ mapview.addAnnotation(pin);
 proceed.addEventListener('click', function()
 {	
 	Location.close();
-	NavGroup.openWindow(events, {animated:true});
+/*	NavGroup.openWindow(events);
+	NavGroup.window = events;
+	loginWin.close(); */
+	NavGroup.open();
 	GetEvents();
 });
 

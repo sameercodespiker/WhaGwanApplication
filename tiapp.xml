@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
-    <id>codespikestudioscodespikestudios.com.whaGwan</id>
+    <id>com.stefan.whagwan</id>
     <name>WhaGwan</name>
     <version>1.0</version>
     <publisher>sameer</publisher>
@@ -13,7 +13,7 @@
     <analytics>true</analytics>
     <guid>8b7c66f6-9c95-4abc-878a-dbf572e33a4e</guid>
     <property name="ti.ui.defaultunit" type="string">dp</property>
-     <property name="ti.facebook.appid">558174570963142</property>
+    <property name="ti.facebook.appid">558174570963142</property>
     <ios>
         <plist>
             <dict>
@@ -48,11 +48,11 @@
         </splash>
         <theme>default</theme>
     </mobileweb>
-        <modules>
+    <modules>
         <!-- Add this line to your modules section -->
         <module platform="iphone">ti.map</module>
         <module platform="android">facebook</module>
-   		 <module platform="iphone">facebook</module>
+        <module platform="iphone">facebook</module>
     </modules>
     <deployment-targets>
         <target device="android">true</target>
