@@ -92,9 +92,9 @@ if (Ti.App.Properties.getString('AppStart') == null)
 	var NavGroup = Ti.UI.iOS.createNavigationWindow({
 	window: events
 	});
-	Ti.API.log(Ti.App.Properties.getString('AppStart'));
+/*	Ti.API.log(Ti.App.Properties.getString('AppStart'));
 	Ti.App.Properties.setString('AppStart', 'true');
-	Ti.API.log(Ti.App.Properties.getString('AppStart'));
+	Ti.API.log(Ti.App.Properties.getString('AppStart')); */
 	}
 else
 { 
@@ -147,14 +147,14 @@ function getGoing( a, b){
 	            	}
 				 else
 	        {
-	             Ti.API.log('Nai chala');	
+	          //   Ti.API.log('Nai chala');	
 	        }
 
   
 	    });
 	
 	} catch(e) {
-	    Ti.API.error('Error: ' + e);
+	   // Ti.API.error('Error: ' + e);
 	}
 }
 
@@ -197,14 +197,14 @@ function getInterested( a, b){
 	            	}
 				 else
 	        {
-	             Ti.API.log('Nai chala');	
+	            // Ti.API.log('Nai chala');	
 	        }
 
   
 	    });
 	
 	} catch(e) {
-	    Ti.API.error('Error: ' + e);
+	 //   Ti.API.error('Error: ' + e);
 	}
 }
 //*********************************//
@@ -302,7 +302,7 @@ var url = "http://whagwanapp.com/webservice3.asmx";
 						}
 						else {
 							db_a.execute('INSERT into Int(Name) VALUES("'+ interestList[i] +'")');
-							Ti.API.log("Insert");
+						//	Ti.API.log("Insert");
 							db_a.close(); 
 						}
 						
@@ -349,7 +349,7 @@ var url = "http://whagwanapp.com/webservice3.asmx";
 	        }
 	    });
 	} catch(e) {
-	    Ti.API.error('Error: ' + e);
+	 //   Ti.API.error('Error: ' + e);
 	}
 
 		
@@ -364,17 +364,17 @@ backgroundImage: 'next.png'
 button.addEventListener('click', function(e){
 					var UN = username.value;
 	 				var PW = pass.value;
-	 				Ti.API.log(UN + " " + PW);
+	 			//	Ti.API.log(UN + " " + PW);
 	 				var db = Ti.Database.open('interest');	
 	 				var Rows = db.execute('SELECT * FROM AppUser where username = "'+ UN +'" ');
 					if(Rows.isValidRow()){
     				//means you already have it in your favorites
-    					Ti.API.log("ExistsInAPPUser");
+    				//	Ti.API.log("ExistsInAPPUser");
     					db.close();
 					}
 					else { 
 						db.execute('INSERT into AppUser(username) VALUES("'+ UN +'")');
-						Ti.API.log("InsertInAPPUser");
+					//	Ti.API.log("InsertInAPPUser");
 						db.close();
 					}
 if (username.hasText() == false || pass.hasText() == false )
@@ -395,12 +395,12 @@ else
 	 		{
 	 			if (GetInterests[i].following == true)
 	 			{
-	 				Ti.API.log("Checking if I am true" + GetInterests[i].title);
+	 			//	Ti.API.log("Checking if I am true" + GetInterests[i].title);
 					userInterests.push(GetInterests[i].title);
 	 			}	
  				else
  				{
-	 				Ti.API.log('i ' + i + ' : ' + GetInterests[i].following);
+	 			//	Ti.API.log('i ' + i + ' : ' + GetInterests[i].following);
 	 			}
 	 		}
 	        
@@ -411,12 +411,12 @@ else
 					var Rows = db.execute('SELECT * FROM Userint where interestfollow = "'+ userInterests[i] +'" ');
 					if(Rows.isValidRow()){
     				//means you already have it in your favorites
-    					Ti.API.log("ExistsInUser");
+    				//	Ti.API.log("ExistsInUser");
     					db.close(); 
 					}
 					else { 
 						db.execute('INSERT into Userint(interestfollow) VALUES("'+ userInterests[i] +'")');
-						Ti.API.log("InsertInUser");
+					//	Ti.API.log("InsertInUser");
 						db.close(); 
 					}
 					
@@ -451,7 +451,7 @@ else
 	} 
 
 	catch(e) {
-	    Ti.API.error('Error: ' + e);
+	 //   Ti.API.error('Error: ' + e);
 	} 
 	 
 
@@ -529,7 +529,7 @@ function GetEvents()
 	db_C.close();
 	
 	
-	Ti.API.log("joji " + intrestsSend);
+//	Ti.API.log("joji " + intrestsSend);
 	
 	var url = "http://whagwanapp.com/webservice.asmx";
 	var callparams = {
@@ -618,17 +618,17 @@ eve[i].addEventListener('click', function(e)
 	var Rows_g = db_g.execute('SELECT * FROM AppUser');
 	var Username = Rows_g.fieldByName('username');
 	var EventName = e.source.buttonname;
-	Ti.API.log("Checking username and Event: " + EventName + " " + Username);
+	//Ti.API.log("Checking username and Event: " + EventName + " " + Username);
 	var CheckUserForEvent = db_g.execute('SELECT UName FROM EventsInterested where EName = "' + EventName + '" ');
 	var CheckUser = CheckUserForEvent.fieldByName('UName');
 	if(CheckUser == Username)
 	{
-		Ti.API.log(CheckUser + "  " + Username + "  Already Interested Events");
+	//	Ti.API.log(CheckUser + "  " + Username + "  Already Interested Events");
 		db_g.close();
 	}
 
 	else{	
-		    Ti.API.log("Inserting Interested Events");
+		//    Ti.API.log("Inserting Interested Events");
 			db_g.execute('INSERT into EventsInterested(UName, EName) VALUES("'+ Username +'", "'+ EventName +'" )');
 			db_g.close();
 		
@@ -650,16 +650,16 @@ eve[i].addEventListener('click', function(e)
 	  if (results_abc && results_abc.length>0) {
 	      var result_abc = results_abc.item(0).text;
 	      var goingCount = result_abc;
-	      Ti.API.log("Interest " + goingCount);
+	   //   Ti.API.log("Interest " + goingCount);
 	    }
 		else
 	        {
-	             Ti.API.log('Nai chala');	
+	           //  Ti.API.log('Nai chala');	
 	        }
 	});
 	
 	} catch(e) {
-	    Ti.API.error('Error: ' + e);
+	 //   Ti.API.error('Error: ' + e);
 	}
 }
 
@@ -955,7 +955,7 @@ testwin.add(fbshare);
 	  		var appUrl = "http://whagwanapp.com/Photos/";
 	  		var imagepath = appUrl + imageName;
 	  		circle.image = imagepath; 
-	  		
+	 // 		Ti.API.log(imagepath);
 	 		 		
 	  		circle.addEventListener('click', function(e){
   				if (urlLink=="")
@@ -975,7 +975,7 @@ testwin.add(fbshare);
   					imageWindow.add(imageview);
   					imageWindow.backButtonTitle = "Back";
   					NavGroup.openWindow(imageWindow);
-	  				Ti.API.log("URL" + urlLink);
+	  			//	Ti.API.log("URL" + urlLink);
 	  			/*	var webview = Ti.UI.createWebView();
 					webview.url = imagepath;
 					testwin.add(webview);
@@ -983,7 +983,7 @@ testwin.add(fbshare);
 	  			}
 	  			else
 	  			{
-	  				Ti.API.log(urlLink);
+	  			//	Ti.API.log(urlLink);
 	  				var webview = Ti.UI.createWebView();
 					webview.url = urlLink;
 					testwin.add(webview);
@@ -1009,8 +1009,8 @@ testwin.add(fbshare);
 var db_e = Ti.Database.open('interest');	
 var Rows = db_e.execute('SELECT * FROM AppUser');
 var Uname = Rows.fieldByName('username');
-Ti.API.log("Checking Rows :" + Uname);
-Ti.API.log("Checking EventName :" + EDarray[0]);
+//Ti.API.log("Checking Rows :" + Uname);
+//Ti.API.log("Checking EventName :" + EDarray[0]);
 db_e.close(); 
 
 var join = Ti.UI.createLabel({
@@ -1025,13 +1025,13 @@ if (e.source.joined == false)
 	e.source.joined = true;
     join.text = 'GOING';
     join.color= 'green';
-    Ti.API.log("if statement chal rai hai");
+    //Ti.API.log("if statement chal rai hai");
 
     
    var db_i = Ti.Database.open('interest');	
    db_i.execute('INSERT into EventsGoing(UName, EName) VALUES("'+ Uname +'", "'+ testwin.myvar +'" )');
    db_i.close();
-    Ti.API.log("what is testwin" + testwin.myvar);
+  //  Ti.API.log("what is testwin" + testwin.myvar);
     var url_abc = "http://whagwanapp.com/webservice5.asmx";
 	var callparams_abc = {
 		un: testwin.myvar,
@@ -1051,18 +1051,18 @@ if (e.source.joined == false)
 	        		{
 	            	var result_abc = results_abc.item(0).text;
 	            	var goingCount = result_abc;
-	            	Ti.API.log("Done " + goingCount);
+	            	//Ti.API.log("Done " + goingCount);
 	            	}
 				 else
 	        {
-	             Ti.API.log('Nai chala');	
+	            // Ti.API.log('Nai chala');	
 	        }
 
   
 	    });
 	
 	} catch(e) {
-	    Ti.API.error('Error: ' + e);
+	   // Ti.API.error('Error: ' + e);
 	}
     
     }
@@ -1071,7 +1071,7 @@ else
     var db_f = Ti.Database.open('interest');	
    	db_f.execute('DELETE FROM EventsGoing where EName = "' + testwin.myvar + '" ');
    	db_f.close();
-    Ti.API.log("else statement chal rai hai");
+  //  Ti.API.log("else statement chal rai hai");
     e.source.joined = false;
     join.text = 'JOIN';
     join.color= 'blue';
@@ -1095,18 +1095,18 @@ else
 	        		{
 	            	var result_abc = results_abc.item(0).text;
 	            	var goingCount = result_abc;
-	            	Ti.API.log("Done " + goingCount);
+	           // 	Ti.API.log("Done " + goingCount);
 	            	}
 				 else
 	        {
-	             Ti.API.log('Nai chala');	
+	   //          Ti.API.log('Nai chala');	
 	        }
 
   
 	    });
 	
 	} catch(e) {
-	    Ti.API.error('Error: ' + e);
+//	    Ti.API.error('Error: ' + e);
 	}
     
     }
@@ -1123,17 +1123,17 @@ else
 		join.color = "green";
 		join.joined = true;
 		testwin.rightNavButton = join;
-		Ti.API.log(" User and Event Exists");
+	//	Ti.API.log(" User and Event Exists");
 		}
 		else {
 		testwin.rightNavButton = join;
-		Ti.API.log("User and Event does not Exists");	
+	//	Ti.API.log("User and Event does not Exists");	
 		}	
 		}
 	else {
 	//db_a.execute('INSERT into EventGoing(UName, EName) VALUES("'+ Uname+'", "'+ EDarray[0] +'" )');
 	testwin.rightNavButton = join;
-	Ti.API.log("Insert Event and Event didnt exist");
+//	Ti.API.log("Insert Event and Event didnt exist");
 	}
 	db_a.close(); 
 	  		
@@ -1145,7 +1145,7 @@ else
 });
 	
 } catch(e) {
-Ti.API.error('Error: ' + e);
+//Ti.API.error('Error: ' + e);
 } 
 
 iconScroll.removeAllChildren();
@@ -1164,7 +1164,7 @@ NavGroup.openWindow(testwin);
 	        }
 	    });
 	} catch(e) {
-	    Ti.API.error('Error: ' + e);
+	  //  Ti.API.error('Error: ' + e);
 	}
 	
 
@@ -1339,7 +1339,7 @@ Interests.addEventListener('open', function(e) {
 					e.source.follow = "false";
 					e.source.backgroundImage = 'eventsButton.png';
 					var deleteInterest = e.source.title;
-					Ti.API.log(deleteInterest);
+					//Ti.API.log(deleteInterest);
 					//var Rows = db.execute('SELECT * FROM Userint where interestfollow = "'+ userInterests[i] +'" ');
 					var db_D = Ti.Database.open('interest');
 					db_D.execute('DELETE FROM Userint WHERE interestfollow= "'+ deleteInterest +'"');
@@ -1349,7 +1349,7 @@ Interests.addEventListener('open', function(e) {
 					e.source.follow = "true";
 					e.source.backgroundImage = 'boxx.png';
 					var addInterest = e.source.title;
-					Ti.API.log(addInterest);
+					//Ti.API.log(addInterest);
 					//db_B.execute('INSERT INTO Userint(interestfollow) VALUES (?)',e.source.title);
 					var db_D = Ti.Database.open('interest');
 					db_D.execute('INSERT into Userint(interestfollow) VALUES("'+ addInterest +'")');
