@@ -35,9 +35,9 @@ var eventdetail = Ti.UI.createWindow({
 
 
 var drawer = Ti.UI.createWindow({
-	left:0,
-	top:0,
-	width:180,
+	left: '0%',
+	top: '0%',
+	width: '50%',
 	borderColor: '#000000',
     backgroundColor: '#a2a2a2',
     toggle: false
@@ -56,11 +56,11 @@ var Location = Ti.UI.createWindow({
 });
 
 var iconScroll = Ti.UI.createScrollView({
-scrollType:'vertical',
-left: 0,
-width:320,
-top: 30
-	});
+	scrollType:'vertical',
+	left: '0%',
+	width: '100%',
+	top: '6.25%'
+});
 
 var fetchinglabel = Ti.UI.createLabel({
 	    top: 2,
@@ -135,10 +135,10 @@ function getGoing( a, b){
 	            	//Ti.API.log("Going: " + goingCount);
 	            	gg[a] = Titanium.UI.createLabel({
 					backgroundColor:'transparent',
-					width:'30',
-					height:'10',
-					left:65,
-					bottom: 5,
+					width:'10%',
+					height:'10%',
+					left:'20%',
+					bottom: '12%',
 					minimumFontSize: 4,
 					text: goingCount
 					});
@@ -185,10 +185,10 @@ function getInterested( a, b){
 	            	//Ti.API.log("Interested:" + interestedCount);
 	            	interPeople[a] = Titanium.UI.createLabel({
 					backgroundColor:'transparent',
-					width:'50',
-					height:'10',
-					right:5,
-					bottom: 5,
+					width:'15%',
+					height:'10%',
+					right:'3%',
+					bottom: '12%',
 					text: interestedCount,
 					minimumFontSize: 4
 					});
@@ -221,56 +221,56 @@ var view = Ti.UI.createView();
 
 var label = Ti.UI.createLabel({
 	text: 'Username',
-	top: 10,
-	left: 10,
-	width:250,
-	height: 35
+	top: '2%',
+	left: '1%',
+	width:'78%',
+	height: '7%'
 	});
 	
 var username = Ti.UI.createTextField({
-color: '#333333',
-hintText: 'UserName',	
-top: 40,
-left: 8,
-width:250,
-height: 35,
+	color: '#333333',
+	hintText: 'UserName',	
+	top: '9%',
+	left: '1%',
+	width:'78%',
+	height: '7%',
 borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED
 });
 
 var label2 = Ti.UI.createLabel({
 	text: 'EmailAddress',
-	top: 70,
-	left: 10,
-	width:250,
-	height: 35
-	});
+	top: '15%',
+	left: '1%',
+	width:'78%',
+	height: '7%',
+});
 
 var pass = Ti.UI.createTextField({
-color: '#333333',
-hintText: 'EmailAddress',	
-top: 100,
-left: 8,
-width:250,
-height: 35,
-borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED
+	color: '#333333',
+	hintText: 'EmailAddress',	
+	top: '21%',
+	left: '1%',
+	width:'78%',
+	height: '7%',
+	borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED
 });
 
 var label3 = Ti.UI.createLabel({
 	text: 'Interests',
-	top: 145,
-	left: 10,
-	width:250,
-	height: 35
+	top: '31%',
+	left: '1%',
+	width:'78%',
+	height: '7%',
 	});
 	
 var interestScroll = Ti.UI.createScrollView({
 scrollType:'vertical',
-left: 0,
-width:320,
-top: 190,
-height: 160,
-showVerticalScrollIndicator: true
-	});
+	left: '0%',
+	width:'100%',
+	top: '39.5%',
+	height: '50%',
+	showVerticalScrollIndicator: true
+});
 
 
 
@@ -296,11 +296,13 @@ var url = "http://whagwanapp.com/webservice3.asmx";
 	          		{	
 	          			var db_a = Ti.Database.open('interest');	
 						var Rows = db_a.execute('SELECT * FROM Int where Name = "'+ interestList[i] +'" ');
-						if(Rows.isValidRow()){
-    					//	Ti.API.log("Exists");
-    					db_a.close(); 
+						if(Rows.isValidRow())
+						{
+    						//	Ti.API.log("Exists");
+    						db_a.close(); 
 						}
-						else {
+						else 
+						{
 							db_a.execute('INSERT into Int(Name) VALUES("'+ interestList[i] +'")');
 						//	Ti.API.log("Insert");
 							db_a.close(); 
@@ -308,14 +310,18 @@ var url = "http://whagwanapp.com/webservice3.asmx";
 						
 	          			var btnH = '30';
 	          			var topValue = 10 + (btnH * i);
-	          			
+	          			var TopValue_b = (topValue/480)* 100;
+	          			var perTopVakue = TopValue_b.toString() + '%';
+	          			var percentage = (btnH/480)* 100;
+	          			var perBtnH = percentage.toString() + '%';
+	          			//Ti.API.log(perBtnH + "And" + perTopVakue + "From" + topValue);
 						GetInterests[i] = Ti.UI.createButton({
 							color: '#000000',
 							title: interestList[i],
-							top: topValue,
-							left: 30,
-							height: btnH,
-							width: 260,
+							top: perTopVakue,
+							left: '9%',
+							height: perBtnH,
+							width: '81%',
 							backgroundImage: 'eventsButton.png',
 							following: false,
 							editable: true
@@ -355,8 +361,8 @@ var url = "http://whagwanapp.com/webservice3.asmx";
 		
 var button = Ti.UI.createButton({
 title: 'NEXT',
-top: 355,
-left: 270,
+top: '94%',
+left: '84%',
 borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
 backgroundImage: 'next.png'
 });
@@ -547,20 +553,24 @@ function GetEvents()
 	        if (results && results.length>0) {
 	        	//var eve = [];
 	            var result = results.item(0).text;
-	          var arrValue = result.split('---');
-	          for (var i = 0; i < arrValue.length - 1; i++){
-	          	buttonProperties = arrValue[i].split('///');
+	         	 var arrValue = result.split('---');
+	          	for (var i = 0; i < arrValue.length - 1; i++){
+	          			buttonProperties = arrValue[i].split('///');
 	          			var btnH = '70';
-		var topValue = 10 + (btnH * i);
-		eve[i] = Ti.UI.createButton({
-		color:'#f00',
-		backgroundImage:'eventsButton.png',
-		top: topValue,
-		left: 30,
-		height: btnH,
-		width: 260,
-		buttonname:'',
-});
+						var topValue = 10 + (btnH * i);
+						var per_a = (btnH/480) * 100;
+						var per_b = (topValue/480)* 100;
+						var btnHper = per_a.toString() + "%";
+						var topValuePer = per_b .toString() + "%"; 
+						eve[i] = Ti.UI.createButton({
+								color:'#f00',
+							    backgroundImage:'eventsButton.png',
+								top: topValuePer,
+								left: '9%',
+								height: btnHper,
+								width: '81.25%',
+								buttonname:'',
+						});
 
 var imagenameforbutton = buttonProperties[1];
 var UrlforImage = "http://whagwanapp.com/Photos/";
@@ -568,20 +578,20 @@ var imagepathforbutton = UrlforImage + imagenameforbutton;
 	  		
 
 eventimage[i]= 	Titanium.UI.createImageView({
-		top: 10,
-		left: 10,
-		height: 50,
-		width: 50,
+		top: '10%',
+		left: '3%',
+		height: '70%',
+		width: '15.6%',
 		image: imagepathforbutton
 });
 
 eve[i].add(eventimage[i]);
 
 eventtitle[i]= Titanium.UI.createLabel({
-	top : 10,
-	height: 25,
-	left: 65,
-	width: 210,
+	top : '10%',
+	height: '5%',
+	left: '20.31%',
+	width: '65%',
 	text:  buttonProperties[0]
 });
 eve[i].add(eventtitle[i]);
@@ -693,15 +703,31 @@ left: 50
 lll.text = testwin.myvar;
 testwin.add(lll);
 
-var circle = Ti.UI.createImageView({
-width: '100dp',
-height: '100dp',
-borderRadius: 50,
-borderColor: '#A9A9A9',
-borderWidth: 5,
-backgroundColor: '#D7D4d8',
-center: {x:'160dp' , y:'210dp'}
-});
+
+if (Ti.Platform.osname == 'iphone' ) 
+{
+			var circle = Ti.UI.createImageView({
+            width: 100,
+            height: 100,
+            borderRadius: 50,
+			borderColor: '#A9A9A9',
+			borderWidth: '5dp',
+			backgroundColor: '#D7D4d8',
+			center: {x:'50%' , y:'50%'}
+			});
+}
+if (Ti.Platform.osname == 'ipad' )
+{
+			var circle = Ti.UI.createImageView({
+            width: 200,
+            height: 200,
+            borderRadius: 100,
+			borderColor: '#A9A9A9',
+			borderWidth: '5dp',
+			backgroundColor: '#D7D4d8',
+			center: {x:'50%' , y:'50%'}
+			});
+}
 
 var going = false;
 
@@ -711,7 +737,8 @@ var fbshare = Ti.UI.createButton({
 backgroundImage: 'fb.png',
 bottom: 0,
 height: Ti.UI.SIZE,
-width: Ti.UI.FILL
+width: Ti.UI.FILL,
+title: 'SHARE'
 });
 
 fbshare.addEventListener('click', function(e){
@@ -753,10 +780,10 @@ fb.dialog("feed", data, function(e) {
 });
 
 var info = Ti.UI.createView({
-top : '10dp',
+top : '2%',
 left: 0,
-height: '200dp',
-width: '160dp',
+height: '49%',
+width: '50%',
 backgroundColor: '#FFFFFF',
 borderColor: '#D7D4d8',
 borderWidth: 5
@@ -770,25 +797,26 @@ width: '140dp'
 var mapview_b = Map.createView({
 	top: 0,
 	left: 0,
-	height: Ti.UI.FILL,
-	width: Ti.UI.FILL,
+	height: Ti.UI.SIZE.FILL,
+	width: Ti.UI.SIZE.FILL,	
     mapType: Map.NORMAL_TYPE,
-    regionFit:true
+	regionFit:true
     });
 
 
 var location = Ti.UI.createView({
-top : '10dp',
-left: '160dp',
+top : '2%',
+left: '50%',
 //height: '50%',
-height: '200dp',
-width: '160dp',
+height: '49%',
+width: '50%',
 backgroundColor: '#FFFFFF',
 borderColor: '#D7D4d8',
 borderWidth: 5
 });
 
 location.add(mapview_b);
+
 var loclabel = Ti.UI.createLabel({
 font: 5,
 height: '120dp',
@@ -796,11 +824,11 @@ width: '140dp'
 });
 
 var ameties = Ti.UI.createView({
-top : '210dp',
-left: '0dp',
+top : '50.75%',
+left: '0%',
 //bottom: 0,
-height: '200dp',
-width: '160dp',
+height: '44%',
+width: '50%',
 backgroundColor: '#FFFFFF',
 borderColor: '#D7D4d8',
 borderWidth: 5
@@ -812,11 +840,11 @@ width: '140dp'
 });
 
 var admission = Ti.UI.createView({
-top : '210dp',
-left: '160dp',
+top : '50.75%',
+left: '50%',
 //bottom: 0,
-height: '200dp',
-width: '160dp',
+height: '44%',
+width: '50%',
 backgroundColor: '#FFFFFF',
 borderColor: '#D7D4d8',
 borderWidth: 5
@@ -962,8 +990,8 @@ testwin.add(fbshare);
   				{	var imageview = Ti.UI.createImageView({
   						image: imagepath,
   						center: {x: "50%", y: "50%"},
-  						width: 250,
-  						height: 250
+  						width: '78.125%',
+  						height: '52.1%'
   						});
  
   					var imageWindow = Ti.UI.createWindow({
@@ -1178,12 +1206,12 @@ events.add(iconScroll);
 //*********************************//
 
 var interestButton = Ti.UI.createButton({
-	top: 60,
+	top: '13%',
 	backgroundImage: 'Interest.png',
 	title: 'Interest',
 	color: '#000000',
-	width: 180,
-	height: 40
+	width: '100%',
+	height: '10%'
 	});
 	
 interestButton.addEventListener('click', function(e){
@@ -1211,12 +1239,12 @@ interestButton.addEventListener('click', function(e){
 
 
 var homeButton = Ti.UI.createButton({
-	top: 110,
+	top: '28%',
 	backgroundImage: 'Home.png',
 	title: 'Home',
 	color: '#000000',
-	width: 180,
-	height: 40
+	width: '100%',
+	height: '10%'
 	});
 	
 homeButton.addEventListener('click', function(e){
@@ -1239,12 +1267,12 @@ homeButton.addEventListener('click', function(e){
 });
 
 var locButton = Ti.UI.createButton({
-	top: 160,
+	top: '42%',
 	backgroundImage: 'Location.png',
 	title: 'Location',
 	color: '#000000',
-	width: 180,
-	height: 40
+	width: '100%',
+	height: '10%'
 	});
 	
 locButton.addEventListener('click', function(e){
@@ -1309,13 +1337,17 @@ Interests.addEventListener('open', function(e) {
 		var name = RowsButton.fieldByName('Name');
 		var btnH = '30';
 	    var topValue = 10 + (btnH * interestCount);
+	    var per_a = (btnH/480)* 100;
+	    var per_b = (topValue/480) * 100;
+	    var btnHper = per_a.toString() + '%';
+	    var topValueper = per_b.toString() + '%';
 		interestbuttons[interestCount] = Ti.UI.createButton({
 			color: '#000000',
 			title: name,
-			top: topValue,
-			left: 30,
-			height: btnH,
-			width: 260,
+			top: topValueper,
+			left: '9%',
+			height: btnHper,
+			width: '82%',
 			backgroundImage: 'eventsButton.png',
 			editable: true,
 			follow: 'false'
@@ -1380,8 +1412,8 @@ var maptoggle = false;
 var view = Ti.UI.createView();
 var label = Ti.UI.createLabel({
 	text: 'PLEASE SPECIFY YOUR LOCATION',
-	top: 40,
-	left: 80,
+	top: '6%',
+	left: '25%',
 	width: Ti.UI.FILL
 });
 
@@ -1410,10 +1442,10 @@ Titanium.Geolocation.distanceFilter = 10; // set the granularity of the location
     });
 
 var mapview = Map.createView({
-	top: 80,
-	left: 40,
-	height: 280,
-	width: 240,
+	top: '16.67%',
+	left: '12.5%',
+	height: '58.33%',
+	width: '75%',
     mapType: Map.NORMAL_TYPE,
     region: {latitude:e_latitude, longitude:e_longitude,
             latitudeDelta:0.01, longitudeDelta:0.01},
@@ -1432,8 +1464,8 @@ var mapview = Map.createView({
 var proceed = Ti.UI.createButton({
 	title: 'Proceed',
 	backgroundImage: 'next.png',
-	top: 380,
-	left: 250
+	top: '85%',
+	left: '78%'
 });
 
 var pin = Map.createAnnotation({
