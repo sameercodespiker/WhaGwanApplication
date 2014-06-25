@@ -92,6 +92,7 @@ if (Ti.App.Properties.getString('AppStart') == null)
 	var NavGroup = Ti.UI.iOS.createNavigationWindow({
 	window: events
 	});
+	Ti.App.Properties.setString('AppStart', 'true');
 /*	Ti.API.log(Ti.App.Properties.getString('AppStart'));
 	Ti.App.Properties.setString('AppStart', 'true');
 	Ti.API.log(Ti.App.Properties.getString('AppStart')); */
@@ -217,7 +218,6 @@ var db_C = Ti.Database.open('interest');
 });*/
 
 
-var view = Ti.UI.createView();
 
 var label = Ti.UI.createLabel({
 	text: 'Username',
@@ -264,13 +264,19 @@ var label3 = Ti.UI.createLabel({
 	});
 	
 var interestScroll = Ti.UI.createScrollView({
-scrollType:'vertical',
+	scrollType:'vertical',
 	left: '0%',
 	width:'100%',
-	top: '39.5%',
-	height: '50%',
+	top: '36.5%',
+	height: '55%',
 	showVerticalScrollIndicator: true
 });
+
+
+var InterestView = Ti.UI.createView({
+  top: 0,
+  width: '100%',
+}); 
 
 
 
@@ -294,11 +300,12 @@ var url = "http://whagwanapp.com/webservice3.asmx";
 	        		var interestList = result.split('/');
 	        		for (var i = 0; i < interestList.length - 1; i++)
 	          		{	
+	          			//Ti.API.log(interestList[i]);
 	          			var db_a = Ti.Database.open('interest');	
 						var Rows = db_a.execute('SELECT * FROM Int where Name = "'+ interestList[i] +'" ');
 						if(Rows.isValidRow())
 						{
-    						//	Ti.API.log("Exists");
+    					//	Ti.API.log("Exists");
     						db_a.close(); 
 						}
 						else 
@@ -318,17 +325,17 @@ var url = "http://whagwanapp.com/webservice3.asmx";
 						GetInterests[i] = Ti.UI.createButton({
 							color: '#000000',
 							title: interestList[i],
-							top: perTopVakue,
+							top: topValue,
 							left: '9%',
-							height: perBtnH,
+							height: btnH,
 							width: '81%',
 							backgroundImage: 'eventsButton.png',
 							following: false,
 							editable: true
 					
 						});
-					interestScroll.add(GetInterests[i]);  
-	  				  			
+					 
+	  				  	
 	  				GetInterests[i].addEventListener('click', function(e)
 	  				{
 	  					if (e.source.following == false)
@@ -346,8 +353,12 @@ var url = "http://whagwanapp.com/webservice3.asmx";
 						}
 	
 					});
-	        	} 
-	       
+					Ti.API.log(GetInterests[i].title);	
+
+					InterestView.add(GetInterests[i]); 
+	        	}
+	        	
+	       	interestScroll.add(InterestView);
 	        }
      else
 	        {
@@ -466,14 +477,14 @@ NavGroup_b.openWindow(Location);
 loginWin.close();
 }});
 
-view.add(username);
-view.add(label);
-view.add(label2);
-view.add(label3);
-view.add(pass);
-view.add(button);
-view.add(interestScroll);
-loginWin.add(view);
+loginWin.add(username);
+loginWin.add(label);
+loginWin.add(label2);
+loginWin.add(label3);
+loginWin.add(pass);
+loginWin.add(button);
+loginWin.add(interestScroll);
+//loginWin.add(view);
 
 
 //*********************************//
@@ -1344,9 +1355,9 @@ Interests.addEventListener('open', function(e) {
 		interestbuttons[interestCount] = Ti.UI.createButton({
 			color: '#000000',
 			title: name,
-			top: topValueper,
+			top: topValue,
 			left: '9%',
-			height: btnHper,
+			height: btnH,
 			width: '82%',
 			backgroundImage: 'eventsButton.png',
 			editable: true,
